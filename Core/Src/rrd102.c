@@ -49,12 +49,15 @@ HAL_StatusTypeDef RDD102_init(RDD102_HandleTypeDef *hrrd102, const RDD102_Config
 
     //dsotosowac do funkcji wyzej
     uint16_t chan = RDD102_CalcChan(config);
-    hrrd102->reg[REG_03H] &= ~(0x3FFU << REG03_CHAN);
+    hrrd102->reg[REG_03H] &= ~(0x3FFU << REG03_CHAN);//poprawic format
     hrrd102->reg[REG_03H] |= (chan << REG03_CHAN);
 
-    hrrd102->reg[REG_04H] = 0;
-    hrrd102->reg[REG_04H] |= (1 << REG04_SOFTMUTE);
-    hrrd102->reg[REG_04H] |= (1 << REG04_DE);
+    hrrd102->reg[REG_04H] = 0xA00U;//poprawic format
+   // hrrd102->reg[REG_04H] |= (1 << REG04_SOFTMUTE);
+    //hrrd102->reg[REG_04H] |= (1 << REG04_DE);
+    hrrd102->reg[REG_05H] = 0x880FU;
+    hrrd102->reg[REG_06H] = 0x0000U;
+    hrrd102->reg[REG_07H] = 0x4202U;
 
 }
 
