@@ -28,6 +28,7 @@ typedef enum {
     REG02_SOFT_RESET = 1,
     REG02_NEW_METHOD = 2,
     REG02_RDS_EN     = 3,
+    REG02_CLKMODE    = 4,
     REG02_SEEK       = 8,
     REG02_SEEKUP     = 9,
     REG02_SKMODE     = 10,
@@ -94,11 +95,15 @@ typedef enum {
     SEEK_UP   = 0x01
 }RRD102_SEEK_MODE; //direction
 
-typedef struct {
-    I2C_HandleTypeDef *hi2c;
-    uint16_t reg[REG_COUNT];
+typedef enum {
+    WRAP = 0x00,
+    STOP_AT_END = 0x01
+}RRD102_SKMODE;
 
-}RDD102_HandleTypeDef;
+typedef enum {
+    OFF = 0x00,
+    ON = 0x01
+} RRD102_EN;
 
 typedef struct {
     float freq;
@@ -107,7 +112,15 @@ typedef struct {
     RRD102_FM_BAND band;
     RDA5807_ClkMode_t clk_mode;
     RRD102_FREQ_SPACE freq_space;
-}RDD102_ConfigTypeDef;
+}RRD102_ConfigTypeDef;
+
+typedef struct {
+    I2C_HandleTypeDef *hi2c;
+    uint16_t reg[REG_COUNT];
+    RRD102_ConfigTypeDef config;
+}RRD102_HandleTypeDef;
+
+
 
 
 
