@@ -3,6 +3,7 @@
 //
 //zrobic przerwanie na gpio ze radio poda kiedy przyszedl rds
 // volume
+// sprawdzanie flag mozna sprawdzac na bierzaco rejestry czy udalo sie np wyszukac fale
 
 #include "main.h"
 #include "rrd102.h"
@@ -34,8 +35,6 @@ static uint16_t RRD102_CalcChan(const RRD102_ConfigTypeDef *config)
     return (uint16_t)((freq_khz-band)/space);
 }
 
-//zagniezdzic config w hrrd102
-// sprawdzic czy nie lepiej do rejestru wpisac jakis domyslny wartos niz bity po kolei
 HAL_StatusTypeDef RDD102_init(RRD102_HandleTypeDef *hrrd102) {
     //hrrd102->reg[REG_02H] = 0;
     hrrd102->reg[REG_02H] = (1<<REG02_ENABLE)     |
@@ -118,10 +117,50 @@ HAL_StatusTypeDef RRD102_CLK_MODE(RRD102_HandleTypeDef *hrrd102, RDA5807_ClkMode
         case RDA_CLK_38_4MHZ:
             hrrd102->reg[REG_02H] |= (RDA_CLK_38_4MHZ << REG02_CLKMODE);
             break;
-
         default:
             hrrd102->reg[REG_02H] |= (RDA_CLK_32_768KHZ << REG02_CLKMODE);
             break;
+    }
+    return RRD102_send_setReg(hrrd102);
+}
+
+
+
+HAL_StatusTypeDef RRD102_setVolume(RRD102_HandleTypeDef *hrrd102, uint8_t volume)
+{
+
+    if(volume > 100) volume = 100;
+    else if(volume < 0) volume = 0;
+
+    hrrd102->reg[REG_05H] &= ~(0x000FU << REG05_VOLUME);
+    uint8_t rescaledVolume = (uint8_t)(15U*volume)/100U;
+    hrrd102->reg[REG_05H] |= (rescaledVolume << REG05_VOLUME);
+
+    return RRD102_send_setReg(hrrd102);
+}
+
+HAL_StatusTypeDef RRD102_readReg(RRD102_HandleTypeDef *hrrd102) {
+    uint8_t buffor_rx[12];
+    HAL_StatusTypeDef s = HAL_I2C_Master_Receive(hrrd102->hi2c, RRD102_I2C_ADDR, buffor_rx, 12, 100);
+    if (HAL_OK == s)
+    {
+        uint16_t reg0A = (buffor_rx[0]<<8) | buffor_rx[1];
+        uint16_t reg0B = (buffor_rx[2]<<8) | buffor_rx[3];
+        uint16_t reg0C = (buffor_rx[4]<<8) | buffor_rx[5];
+        uint16_t reg0D = (buffor_rx[6]<<8) | buffor_rx[7];
+        uint16_t reg0E = (buffor_rx[8]<<8) | buffor_rx[9];
+        uint16_t reg0F = (buffor_rx[10]<<8) | buffor_rx[11];
+
+        hrrd102->status.readChan = reg0A & 0xFC00U;
+        hrrd102->status.st = (reg0A & (1U << 10)) != 0;
+        hrrd102->status.blk_e = (reg0A & (1U << 11)) != 0;
+        hrrd102->status.rdss= (reg0A & (1U << 12)) != 0;
+        hrrd102->status.sf = (reg0A & (1U << 13)) != 0;
+        hrrd102->status.stc = (reg0A & (1U << 14)) != 0;
+        hrrd102->status.rdsr = (reg0A & (1U << 15)) != 0;
+
+
+
     }
 
 }

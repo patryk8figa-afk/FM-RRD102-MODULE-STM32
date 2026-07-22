@@ -22,7 +22,16 @@ typedef enum {
     REG_07H,
     REG_COUNT
 }RRD102_Registers;
-
+/*
+typedef enum {
+    REG_0AH = 0,
+    REG_0BH = 1,
+    REG_0CH = 2,
+    REG_0DH = 3,
+    REG_0EH = 4,
+    REG_0FH = 5
+}RRD102_RegistersRec;
+*/
 typedef enum {
     REG02_ENABLE     = 0,
     REG02_SOFT_RESET = 1,
@@ -114,10 +123,33 @@ typedef struct {
     RRD102_FREQ_SPACE freq_space;
 }RRD102_ConfigTypeDef;
 
+typedef struct {//moze to nie bedzie potrzebne
+    //Reg0A
+    uint16_t readChan;
+    bool st;
+    bool blk_e;
+    bool rdss;
+    bool sf;
+    bool stc;
+    bool rdsr;
+
+    //Reg0B
+    uint8_t blerb;
+    uint8_t blera;
+    bool abcd_e;
+    bool fm_ready;
+    bool fm_true;
+    uint8_t rssi;
+
+}RRD102_StatusTypeDef;
+
 typedef struct {
     I2C_HandleTypeDef *hi2c;
     uint16_t reg[REG_COUNT];
+    //uint16_t regRec[6];
     RRD102_ConfigTypeDef config;
+    RRD102_StatusTypeDef status;
+
 }RRD102_HandleTypeDef;
 
 
