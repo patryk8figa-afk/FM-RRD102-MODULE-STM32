@@ -161,7 +161,6 @@ HAL_StatusTypeDef RRD102_readReg(RRD102_HandleTypeDef *hrrd102) {
         hrrd102->status.stc = (reg0A & (1U << 14)) != 0;
         hrrd102->status.rdsr = (reg0A & (1U << 15)) != 0;
 
-        //0B
         hrrd102->status.blerb = reg0B &  0x3U;
         hrrd102->status.blera = (reg0B & 0xCU)>>2;
         hrrd102->status.abcd_e = (reg0B & (1U << 4)) !=0;
@@ -173,3 +172,10 @@ HAL_StatusTypeDef RRD102_readReg(RRD102_HandleTypeDef *hrrd102) {
     return s;
 
 }
+
+/*
+ * bits 15 - 11 Group bits 0x00 or 0x01 - name of station, 0x04 or 0x05 radio text, 0x08 date and time
+ * bit 10 if set traffic program is running
+ * bits 9-5 Program type - 1 news, 4 sport, 0x0A pop music, 0x0B rock
+ * Przykładowo, jeśli Typ Grupy to "nazwa stacji" (Grupa 0), to najmłodsze dwa bity informują, na jakiej pozycji w tekście powinieneś wstawić litery z Bloku D (pozycja 1-2, 3-4, 5-6 czy 7-8).
+ */
