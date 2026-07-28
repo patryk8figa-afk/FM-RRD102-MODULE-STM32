@@ -1,10 +1,11 @@
 //
 // Created by Pat on 09/07/2026.
 //
-//zrobic przerwanie na gpio ze radio poda kiedy przyszedl rds
-// volume
-// sprawdzanie flag mozna sprawdzac na bierzaco rejestry czy udalo sie np wyszukac fale
 
+//TODO
+//zrobic przerwanie na gpio ze radio poda kiedy przyszedl rds
+// sprawdzanie flag mozna sprawdzac na bierzaco rejestry czy udalo sie np wyszukac fale
+// ZROBIC zeby szukal tej samej stacji ale o silniejszym sygnale sprawdzic bo bylo cos do wyswietlania mocy wszystkich stacji naraz
 #include "main.h"
 #include "rrd102.h"
 
@@ -146,10 +147,10 @@ HAL_StatusTypeDef RRD102_readReg(RRD102_HandleTypeDef *hrrd102) {
     {
         uint16_t reg0A = (buffor_rx[0]<<8) | buffor_rx[1];
         uint16_t reg0B = (buffor_rx[2]<<8) | buffor_rx[3];
-        uint16_t reg0C = (buffor_rx[4]<<8) | buffor_rx[5];
-        uint16_t reg0D = (buffor_rx[6]<<8) | buffor_rx[7];
-        uint16_t reg0E = (buffor_rx[8]<<8) | buffor_rx[9];
-        uint16_t reg0F = (buffor_rx[10]<<8) | buffor_rx[11];
+        hrrd102->status.blockA= (buffor_rx[4]<<8) | buffor_rx[5];
+        hrrd102->status.blockB = (buffor_rx[6]<<8) | buffor_rx[7];
+        hrrd102->status.blockC = (buffor_rx[8]<<8) | buffor_rx[9];
+        hrrd102->status.blockD = (buffor_rx[10]<<8) | buffor_rx[11];
 
         hrrd102->status.readChan = reg0A & 0xFC00U;
         hrrd102->status.st = (reg0A & (1U << 10)) != 0;
@@ -158,6 +159,15 @@ HAL_StatusTypeDef RRD102_readReg(RRD102_HandleTypeDef *hrrd102) {
         hrrd102->status.sf = (reg0A & (1U << 13)) != 0;
         hrrd102->status.stc = (reg0A & (1U << 14)) != 0;
         hrrd102->status.rdsr = (reg0A & (1U << 15)) != 0;
+
+        //0B
+        hrrd102->status.blerb = reg0B &  0x3U;
+        hrrd102->status.blera = reg0B & 0xCU;
+        hrrd102->status.abcd_e = (reg0B & (1U << 4)) !=0;
+        hrrd102->status.fm_ready = (reg0B & (1U << 7)) !=0;
+        hrrd102->status.fm_true = (reg0B & (1U << 8)) !=0;
+        hrrd102->status.rssi = (reg0B & 0xFE00U)>>9;
+
 
 
 

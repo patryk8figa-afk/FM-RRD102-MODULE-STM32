@@ -141,6 +141,12 @@ typedef struct {//moze to nie bedzie potrzebne
     bool fm_true;
     uint8_t rssi;
 
+    //Reg0C
+    uint16_t blockA;
+    uint16_t blockB;
+    uint16_t blockC;
+    uint16_t blockD;
+
 }RRD102_StatusTypeDef;
 
 typedef struct {
